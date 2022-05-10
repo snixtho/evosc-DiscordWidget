@@ -1,5 +1,7 @@
 # evosc-DiscordWidget
 
+![](img/screenshot.png)
+
 # Installation
 
 1. Download the [latest release](https://github.com/snixtho/evosc-DiscordWidget/releases/latest/download/DiscordWidget.zip)
