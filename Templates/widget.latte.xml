@@ -1,0 +1,55 @@
+{contentType text}
+{extends 'Components.widget-base'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}discord-widget{/block}
+    {block size}44 30{/block}
+
+    {block content}
+    <quad class="bg-accent" size="50 5" z-index="-1" />
+    <quad id="bg" class="bg-dark" size="50 {1+(5*count($channels))}" pos="0 -5" opacity="0.8" z-index="-1" />
+    <label class="text-light" pos="2 -2.5" valign="center" textsize="0.5" text=" Discord | {$widget->presence_count} online" z-index="1" textprefix="" textfont="{config('colors.ui.font')|noescape}" />
+    <label class="btn-accent join" size="9 4" pos="39 -2.5" valign="center" textsize="0.5" text="Join " ScriptEvents="1" z-index="1" />
+
+    <frame pos="0 -5" z-index="1">
+        {foreach $channels as $i => $channel}
+            <label class="text-light" pos="2 {-3 - $i*5}" valign="center" textsize="0.75" text=" {$channel['name']}" />
+            <label class="text-light" pos="25 {-2 - $i*5}" valign="right" textsize="0.4" text=" {$channel['connected']}" />
+            <label class="btn-default connect_{$channel['id']}" size="12 4" pos="37 {-3 - $i*5}" valign="center" textsize="0.75" text="Connect" ScriptEvents="1" />
+        {/foreach}
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    --></script>
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+
+        left__ = {config('discord-widget.ui.position') == 'left'|ms_bool};
+        slot__ = {config('discord-widget.ui.slot')};
+    {/block} 
+
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+    if (event.Type == CMlScriptEvent::Type::MouseClick) {
+        if (event.Control.HasClass("join")) {
+            OpenLink("{$widget->instant_invite}", ::LinkType::ExternalBrowser);
+        }
+
+        {foreach $channels as $channel}
+        if (event.Control.HasClass("connect_{$channel['id']}")) {
+            OpenLink("{$channel['invite']}", ::LinkType::ExternalBrowser);
+        }
+        {/foreach}
+    }
+    {/block}
+--></script>
+</manialink>

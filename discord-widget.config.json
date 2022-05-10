@@ -1,0 +1,15 @@
+{
+    "ui": {
+        "position": "left",
+        "slot": 50
+    },
+
+    "channels": [
+        {
+            "invite": "https://discord.gg/<invitecode>",
+            "id": 123
+        }
+    ],
+
+    "url": "<widget url>"
+}
