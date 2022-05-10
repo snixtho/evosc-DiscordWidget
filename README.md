@@ -18,3 +18,5 @@ Must be an array of info about voice channels that will be displayed and tracked
 
 ### Widget URL
 The `url` option must contain the "JSON API" url you can find in Server Settings -> Widget. Make sure *Enable Server Widget* is on.
+
+For the "Join" button to work, select a channel for the widget invite in Server Settings -> Widget -> Invite Channel
