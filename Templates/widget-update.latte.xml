@@ -1,17 +1,17 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" id="evoachievements-lbpages-update" name="EvoSC:evoachievements-lbpages-update">
+<manialink version="3" id="discord-widget-update" name="EvoSC:discord-widget-update">
     <script><!--
     
     main() {
         declare Text DiscordWidget_Channels for This;
-        DiscordWidget_Channels = """{$channels}|noescape""";
+        DiscordWidget_Channels = """{$channels|noescape}""";
 
-        declare Text DiscordWidget_Widget for This;
-        DiscordWidget_Widget = """{$widget|noescape}""";
+        declare Integer DiscordWidget_PresenceCount for This;
+        DiscordWidget_PresenceCount = {$presenceCount};
 
-        declare Boolean DiscordWidget_Updated for this;
-        DiscordWidget_Updated = False;
+        declare Boolean DiscordWidget_HasUpdate for This;
+        DiscordWidget_HasUpdate = True;
     }
     --></script>
 </manialink>

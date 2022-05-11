@@ -3,16 +3,15 @@
 
 namespace EvoSC\Modules\DiscordWidget;
 
-use EvoSC\Classes\Cache;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
-use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use EvoSC\Classes\RestClient;
 use EvoSC\Classes\Timer;
+use EvoSC\Classes\ManiaLinkEvent;
 use Exception;
 
 class DiscordWidget extends Module implements ModuleInterface
@@ -26,7 +25,7 @@ class DiscordWidget extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'displayWidget']);
-        Timer::create('UpdateDiscordWidget', [self::class, 'update'], '5s', true);
+        Timer::create('UpdateDiscordWidget', [self::class, 'update'], '5m', true);
     }
 
     public static function updateWidget() {
@@ -47,21 +46,11 @@ class DiscordWidget extends Module implements ModuleInterface
         return null;
     }
 
-    public static function update() {
-        self::updateChannels();
-
-        $channels = self::$channels;
-        $widget = [
-            'instant_invite' => self::$widget->instant_invite,
-            'presence_count' => self::$widget->presence_count
-        ];
-
-
-        Template::showAll('DiscordWidget.widget', compact('channels', 'widget'));
-    }
-
-    public static function updateChannels()
+    public static function updateChannels($withCache=false)
     {
+        if ($withCache && count(self::$channels) > 0)
+            return;
+
         self::updateWidget();
         $newChannels = [];
 
@@ -79,7 +68,7 @@ class DiscordWidget extends Module implements ModuleInterface
                         'connected' => $numConnected,
                         'name' => $widgetChannel->name,
                         'invite' => $configChannel->invite,
-                        'id' => $widgetChannel->id
+                        'id' => $configChannel->id
                     ]);
                 }
             }
@@ -88,10 +77,25 @@ class DiscordWidget extends Module implements ModuleInterface
         self::$channels = $newChannels;
     }
 
+    public static function update() {
+        self::updateChannels();
+
+        $channels = collect(self::$channels)->map(function($item, $key) {
+            return [
+                'name' => $item['name'],
+                'connected' => $item['connected'],
+                'id' => $item['id']
+            ];
+        });
+
+        $presenceCount = self::$widget->presence_count;
+
+        Template::showAll('DiscordWidget.widget-update', compact('channels', 'presenceCount'));
+    }
+
     public static function displayWidget(Player $player)
     {
-        self::updateChannels();
-        // $channelConfigs = config('discord-widget.channels');
+        self::updateChannels(true);
         $channels = self::$channels;
         $widget = [
             'instant_invite' => self::$widget->instant_invite,
@@ -99,6 +103,5 @@ class DiscordWidget extends Module implements ModuleInterface
         ];
 
         Template::show($player, 'DiscordWidget.widget', compact('channels', 'widget'));
-        // Template::show($player, 'DiscordWidget.widget-update', compact('channels', 'widget'));
     }
 }

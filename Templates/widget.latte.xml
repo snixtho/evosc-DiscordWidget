@@ -7,35 +7,68 @@
 
     {block content}
     <quad class="bg-accent" size="50 5" z-index="-1" />
-    <quad id="bg" class="bg-dark" size="50 {1+(5*count($channels))}" pos="0 -5" opacity="0.8" z-index="-1" />
-    <label class="text-light" pos="2 -2.5" valign="center" textsize="0.5" text=" Discord | {$widget['presence_count']} online" z-index="1" textprefix="" textfont="{config('colors.ui.font')|noescape}" />
+    <quad id="bg" class="bg-dark" size="50 {1 + 5*count($channels)}" pos="0 -5" opacity="0.8" z-index="-1" />
+    <label class="text-light" pos="2 -2.5" valign="center" textsize="0.5" id="title" text=" Discord | {$widget['presence_count']} online" z-index="1" textprefix="" textfont="{config('colors.ui.font')|noescape}" />
     <label class="btn-accent join" size="9 4" pos="39 -2.5" valign="center" textsize="0.5" text="Join " ScriptEvents="1" z-index="1" />
 
-    <frame pos="0 -5" z-index="1">
+    <frame pos="0 -5" z-index="1" id="channel_list">
         {foreach $channels as $i => $channel}
-            <label class="text-light" pos="2 {-3 - $i*5}" valign="center" textsize="0.75" text=" {$channel['name']}" />
-            <label class="text-light" pos="25 {-2 - $i*5}" valign="right" textsize="0.4" text=" {$channel['connected']}" />
-            <label class="btn-default connect_{$channel['id']}" size="12 4" pos="37 {-3 - $i*5}" valign="center" textsize="0.75" text="Connect" ScriptEvents="1" />
+            <frame pos="2 {-$i*5}">
+                <label class="text-light" id="channel_name_{$channel['id']}" pos="0 -3" valign="center" textsize="0.75" text=" {$channel['name']}" />
+                <label class="text-light" id="channel_count_{$channel['id']}" pos="23 -2" valign="right" textsize="0.4" text=" {$channel['connected']}" />
+                <label class="btn-default channel_connect_{$channel['id']}" size="12 4" pos="35 -3" valign="center" textsize="0.75" text="Connect" ScriptEvents="1" />
+            </frame>
         {/foreach}
     </frame>
     {/block}
 
     {block script}
     <script><!--
+        Void UpdateWidget() {
+            declare Text DiscordWidget_Channels for This;
+            declare Integer DiscordWidget_PresenceCount for This;
+
+            declare Channel[] channels;
+
+            channels.fromjson(DiscordWidget_Channels);
+
+            declare ctrlTitle <=> (Page.MainFrame.GetFirstChild("title") as CMlLabel);
+            ctrlTitle.SetText(" Discord | " ^ DiscordWidget_PresenceCount ^ " online");
+
+            foreach (channel in channels) {
+                declare name <=> (Page.MainFrame.GetFirstChild("channel_name_" ^ channel.id) as CMlLabel);
+                declare count <=> (Page.MainFrame.GetFirstChild("channel_count_" ^ channel.id) as CMlLabel);
+
+                name.SetText(" " ^ channel.name);
+                count.SetText(" " ^ channel.connected);
+            }
+
+            declare Boolean DiscordWidget_HasUpdate for This;
+            DiscordWidget_HasUpdate = False;
+        }
     --></script>
     {/block}
 
     <script><!--
     {block globals}
+        #Struct Channel {
+            Integer connected;
+            Text name;
+            Text id;
+        }
     {/block}
 
     {block bootScript}
-
         left__ = {config('discord-widget.ui.position') == 'left'|ms_bool};
         slot__ = {config('discord-widget.ui.slot')};
     {/block} 
 
     {block loop}
+        declare Boolean DiscordWidget_HasUpdate for This;
+
+        if (DiscordWidget_HasUpdate) {
+            UpdateWidget();
+        }
     {/block}
 
     {block pendingEvents}
@@ -45,7 +78,7 @@
         }
 
         {foreach $channels as $channel}
-        if (event.Control.HasClass("connect_{$channel['id']}")) {
+        if (event.Control.HasClass("channel_connect_{$channel['id']}")) {
             OpenLink("{$channel['invite']}", ::LinkType::ExternalBrowser);
         }
         {/foreach}
