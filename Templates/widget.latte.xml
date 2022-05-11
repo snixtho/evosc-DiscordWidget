@@ -8,7 +8,7 @@
     {block content}
     <quad class="bg-accent" size="50 5" z-index="-1" />
     <quad id="bg" class="bg-dark" size="50 {1+(5*count($channels))}" pos="0 -5" opacity="0.8" z-index="-1" />
-    <label class="text-light" pos="2 -2.5" valign="center" textsize="0.5" text=" Discord | {$widget->presence_count} online" z-index="1" textprefix="" textfont="{config('colors.ui.font')|noescape}" />
+    <label class="text-light" pos="2 -2.5" valign="center" textsize="0.5" text=" Discord | {$widget['presence_count']} online" z-index="1" textprefix="" textfont="{config('colors.ui.font')|noescape}" />
     <label class="btn-accent join" size="9 4" pos="39 -2.5" valign="center" textsize="0.5" text="Join " ScriptEvents="1" z-index="1" />
 
     <frame pos="0 -5" z-index="1">
@@ -41,7 +41,7 @@
     {block pendingEvents}
     if (event.Type == CMlScriptEvent::Type::MouseClick) {
         if (event.Control.HasClass("join")) {
-            OpenLink("{$widget->instant_invite}", ::LinkType::ExternalBrowser);
+            OpenLink("{$widget['instant_invite']}", ::LinkType::ExternalBrowser);
         }
 
         {foreach $channels as $channel}

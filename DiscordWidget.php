@@ -26,7 +26,7 @@ class DiscordWidget extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'displayWidget']);
-        Timer::create('UpdateDiscordWidget', [self::class, 'update'], '5m', true);
+        Timer::create('UpdateDiscordWidget', [self::class, 'update'], '5s', true);
     }
 
     public static function updateWidget() {
@@ -51,7 +51,11 @@ class DiscordWidget extends Module implements ModuleInterface
         self::updateChannels();
 
         $channels = self::$channels;
-        $widget = self::$widget;
+        $widget = [
+            'instant_invite' => self::$widget->instant_invite,
+            'presence_count' => self::$widget->presence_count
+        ];
+
 
         Template::showAll('DiscordWidget.widget', compact('channels', 'widget'));
     }
@@ -66,7 +70,7 @@ class DiscordWidget extends Module implements ModuleInterface
                 if ($widgetChannel->id == $configChannel->id) {
                     $numConnected = 0;
                     foreach (self::$widget->members as $widgetMember) {
-                        if ($widgetMember->channel_id != null && $widgetMember->channel_id == $widgetChannel->id) {
+                        if (property_exists($widgetMember, 'channel_id') && $widgetMember->channel_id == $widgetChannel->id) {
                             $numConnected++;
                         }
                     }
@@ -89,8 +93,12 @@ class DiscordWidget extends Module implements ModuleInterface
         self::updateChannels();
         // $channelConfigs = config('discord-widget.channels');
         $channels = self::$channels;
-        $widget = self::$widget;
+        $widget = [
+            'instant_invite' => self::$widget->instant_invite,
+            'presence_count' => self::$widget->presence_count
+        ];
 
         Template::show($player, 'DiscordWidget.widget', compact('channels', 'widget'));
+        // Template::show($player, 'DiscordWidget.widget-update', compact('channels', 'widget'));
     }
 }

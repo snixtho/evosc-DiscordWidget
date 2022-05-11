@@ -1,0 +1,17 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" id="evoachievements-lbpages-update" name="EvoSC:evoachievements-lbpages-update">
+    <script><!--
+    
+    main() {
+        declare Text DiscordWidget_Channels for This;
+        DiscordWidget_Channels = """{$channels}|noescape""";
+
+        declare Text DiscordWidget_Widget for This;
+        DiscordWidget_Widget = """{$widget|noescape}""";
+
+        declare Boolean DiscordWidget_Updated for this;
+        DiscordWidget_Updated = False;
+    }
+    --></script>
+</manialink>
